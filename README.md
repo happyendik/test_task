@@ -1,4 +1,4 @@
-Чтобы развернуть проект, выполените следующие шаги:
+Чтобы развернуть проект, выполните следующие шаги:
 
 1. git clone git@github.com:happyendik/test_task.git
 2. composer install
