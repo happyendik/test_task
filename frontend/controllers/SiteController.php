@@ -7,11 +7,13 @@ use frontend\models\PasswordResetRequestForm;
 use frontend\models\ProfileForm;
 use frontend\models\ResetPasswordForm;
 use frontend\models\SignupForm;
+use frontend\models\Users;
 use Yii;
 use yii\filters\AccessControl;
-use yii\filters\VerbFilter;
 use yii\web\BadRequestHttpException;
 use yii\web\Controller;
+use yii\web\Response;
+use yii\widgets\ActiveForm;
 
 /**
  * Site controller
@@ -28,7 +30,7 @@ class SiteController extends Controller
                 'class' => AccessControl::class,
                 'rules' => [
                     [
-                        'actions' => ['signup', 'login', 'index', 'confirmation'],
+                        'actions' => ['signup', 'login', 'index', 'confirmation', 'leko', 'leko-success', 'ajax-leko-validation'],
                         'allow' => true,
                         'roles' => ['?'],
                     ],
@@ -37,12 +39,6 @@ class SiteController extends Controller
                         'allow' => true,
                         'roles' => ['@'],
                     ],
-                ],
-            ],
-            'verbs' => [
-                'class' => VerbFilter::class,
-                'actions' => [
-                    'logout' => ['post'],
                 ],
             ],
         ];
@@ -229,5 +225,32 @@ class SiteController extends Controller
         return $this->render('profile', [
             'model' => $model
         ]);
+    }
+
+    public function actionLeko() {
+        $model = new Users();
+
+        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+            $model->save();
+
+            $this->redirect(['site/leko-success']);
+        }
+
+        return $this->render('leko', [
+            'model' => $model
+        ]);
+    }
+
+    public function actionLekoSuccess()
+    {
+        echo 'Регистрация завершена';
+    }
+
+    public function actionAjaxLekoValidation() {
+        $model = new Users();
+        if (Yii::$app->request->isAjax && $model->load(Yii::$app->request->post())) {
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            return ActiveForm::validate($model);
+        }
     }
 }
